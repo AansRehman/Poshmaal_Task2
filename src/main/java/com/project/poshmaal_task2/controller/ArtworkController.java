@@ -123,6 +123,34 @@ public class ArtworkController {
 
     }
 
+    @GetMapping("/listMostExpensiveSoldArtWorksofArtist/{id}")
+    public ResponseEntity<List<Artwork>> listMostExpensiveSoldArtWorksofArtist(@PathVariable("id") Long id){
+//        TODO
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
 
+    @GetMapping("/avgPriceOfUnsoldArtWorks")
+    public ResponseEntity<Double> avgPriceOfUnsoldArtWorks(){
+//        TODO
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/listArtWorksfromCountry/{country}")
+    public ResponseEntity<List<Artwork>> listArtWorksfromCountry(@PathVariable("country") String country){
+//        TODO
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PutMapping("/changePrice/{id}")
+    public ResponseEntity<Artwork> changePrice(@PathVariable("id") Long id, @RequestBody double price){
+//        TODO
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PutMapping("changeStatus/{id}")
+    public ResponseEntity<Artwork> changeStatus(@PathVariable("id") Long id, @RequestBody String status){
+//        TODO
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
 
 }
