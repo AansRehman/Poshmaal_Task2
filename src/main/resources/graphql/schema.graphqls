@@ -1,0 +1,54 @@
+# Employee Type
+type Employee {
+    id: ID!
+    email: String!
+    firstname: String!
+    lastname: String!
+    locked: Boolean!
+    role: String!
+}
+
+# Artwork Type
+type Artwork {
+    id: ID!
+    title: String!
+    yearOfCompletion: Int!
+    price: Float!
+    sold: Boolean!
+    artistId: ID!
+}
+
+# Input Type for Adding Artwork
+input ArtworkInput {
+    title: String!
+    yearOfCompletion: Int!
+    price: Float!
+    sold: Boolean!
+    artistId: ID!
+}
+
+
+# Schema Definition
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+# Query Type
+type Query {
+    # List all employees without passwords
+    employees: [Employee!]!
+
+    # Find an employee by ID without password
+    employee(id: ID!): Employee
+}
+
+# Mutation Type
+type Mutation {
+    # Delete an employee by ID
+    deleteEmployee(id: ID!): Boolean!
+
+    # Add a new artwork
+    addArtwork(input: ArtworkInput!): Artwork!
+}
+
