@@ -34,7 +34,7 @@ public class ArtworkRepositoryImpl implements ArtworkRepository {
 
     @Override
     public Artwork updateArtwork(Long id, Artwork artwork) {
-        int result = jdbcTemplate.update(UPDATE_ARTWORK_SQL, artwork.getTitle(), artwork.getYearOfCompletion(), artwork.getPrice(), artwork.isSold(), artwork.getId(), id);
+        int result = jdbcTemplate.update(UPDATE_ARTWORK_SQL, artwork.getTitle(), artwork.getYearOfCompletion(), artwork.getPrice(), artwork.isSold(), artwork.getArtist_id(), id);
         return result == 1 ? artwork : null;
     }
 

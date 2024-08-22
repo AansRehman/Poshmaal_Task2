@@ -1,6 +1,8 @@
 package com.project.poshmaal_task2.controller;
 
+import com.project.poshmaal_task2.model.Artist;
 import com.project.poshmaal_task2.model.Artwork;
+import com.project.poshmaal_task2.repository.ArtistRepository;
 import com.project.poshmaal_task2.repository.ArtworkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,9 @@ import java.util.List;
 public class ArtworkController {
     @Autowired
     ArtworkRepository artworkRepository;
+
+    @Autowired
+    ArtistRepository artistRepository;
 
     @GetMapping("/listAllArtworks")
     public ResponseEntity<List<Artwork>> getAllArtworks(){
@@ -125,32 +130,90 @@ public class ArtworkController {
 
     @GetMapping("/listMostExpensiveSoldArtWorksofArtist/{id}")
     public ResponseEntity<List<Artwork>> listMostExpensiveSoldArtWorksofArtist(@PathVariable("id") Long id){
-//        TODO
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        List<Artwork> artworksByArtist = artworksByArtistFunc(id);
+        List<Artwork> soldArtworks = new ArrayList<>();
+
+        for (Artwork artwork : artworksByArtist) {
+            if (artwork.isSold()) {
+                soldArtworks.add(artwork);
+            }
+        }
+
+        // Sorting sold artworks by price in descending order
+        soldArtworks.sort((a1, a2) -> Double.compare(a2.getPrice(), a1.getPrice()));
+
+        if (!soldArtworks.isEmpty()) {
+            return new ResponseEntity<>(soldArtworks, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
     }
 
     @GetMapping("/avgPriceOfUnsoldArtWorks")
     public ResponseEntity<Double> avgPriceOfUnsoldArtWorks(){
-//        TODO
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        List<Artwork> artworks = artworkRepository.findAllArtWorks();
+        double totalPrice = 0;
+        int count = 0;
+
+        for (Artwork artwork : artworks) {
+            if (!artwork.isSold()) {
+                totalPrice += artwork.getPrice();
+                count++;
+            }
+        }
+
+        if (count > 0) {
+            double avgPrice = totalPrice / count;
+            return new ResponseEntity<>(avgPrice, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
     }
 
     @GetMapping("/listArtWorksfromCountry/{country}")
     public ResponseEntity<List<Artwork>> listArtWorksfromCountry(@PathVariable("country") String country){
-//        TODO
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        List<Artwork> artworks = artworkRepository.findAllArtWorks();
+        List<Artwork> artworksFromCountry = new ArrayList<>();
+
+        for (Artwork artwork : artworks) {
+            Artist artist = artistRepository.findById(artwork.getArtist_id());
+            if (artist != null && country.equalsIgnoreCase(artist.getCountryOfBirth())) {
+                artworksFromCountry.add(artwork);
+            }
+        }
+
+        if (!artworksFromCountry.isEmpty()) {
+            return new ResponseEntity<>(artworksFromCountry, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
     }
 
     @PutMapping("/changePrice/{id}")
     public ResponseEntity<Artwork> changePrice(@PathVariable("id") Long id, @RequestBody double price){
-//        TODO
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Artwork artwork = artworkRepository.findArtWorkById(id);
+
+        if (artwork != null) {
+            artwork.setPrice(price);
+            artworkRepository.updateArtwork(id, artwork);
+            return new ResponseEntity<>(artwork, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    @PutMapping("changeStatus/{id}")
-    public ResponseEntity<Artwork> changeStatus(@PathVariable("id") Long id, @RequestBody String status){
-//        TODO
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @PutMapping("/changeStatus/{id}")
+    public ResponseEntity<Artwork> changeStatus(@PathVariable("id") Long id, @RequestBody boolean status){
+        Artwork artwork = artworkRepository.findArtWorkById(id);
+
+        if (artwork != null) {
+            artwork.setSold(status);
+            artworkRepository.updateArtwork(id, artwork);
+            return new ResponseEntity<>(artwork, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
+
 
 }
