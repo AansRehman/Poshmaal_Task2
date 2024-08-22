@@ -2,8 +2,10 @@ package com.project.poshmaal_task2.controller;
 
 import com.project.poshmaal_task2.model.Artist;
 import com.project.poshmaal_task2.model.Artwork;
+import com.project.poshmaal_task2.model.Employee;
 import com.project.poshmaal_task2.repository.ArtistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -67,4 +69,8 @@ public class ArtistController {
             return new ResponseEntity<>("Failed to delete artist", HttpStatus.NOT_FOUND);
         }
     }
+
+
+
+
 }

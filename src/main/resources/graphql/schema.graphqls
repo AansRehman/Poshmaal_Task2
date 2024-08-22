@@ -1,9 +1,9 @@
 # Employee Type
 type Employee {
-    id: ID!
+#    id: ID!
     email: String!
-    firstname: String!
-    lastname: String!
+    firstName: String!
+    lastName: String!
     locked: Boolean!
     role: String!
 }
@@ -15,7 +15,7 @@ type Artwork {
     yearOfCompletion: Int!
     price: Float!
     sold: Boolean!
-    artistId: ID!
+    artist_id: ID!
 }
 
 # Input Type for Adding Artwork
@@ -24,7 +24,7 @@ input ArtworkInput {
     yearOfCompletion: Int!
     price: Float!
     sold: Boolean!
-    artistId: ID!
+    artist_id: ID!
 }
 
 
@@ -37,18 +37,18 @@ schema {
 # Query Type
 type Query {
     # List all employees without passwords
-    employees: [Employee!]!
+    findAllEmployees: [Employee!]!
 
     # Find an employee by ID without password
-    employee(id: ID!): Employee
+    getEmployee(email: String!): Employee
 }
 
 # Mutation Type
 type Mutation {
     # Delete an employee by ID
-    deleteEmployee(id: ID!): Boolean!
+    deleteEmployee(email: String!): Boolean!
 
     # Add a new artwork
-    addArtwork(input: ArtworkInput!): Artwork!
+    addArtwork(artwork: ArtworkInput!): Artwork!
 }
 

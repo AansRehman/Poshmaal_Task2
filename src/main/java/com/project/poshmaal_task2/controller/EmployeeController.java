@@ -4,6 +4,7 @@ import com.project.poshmaal_task2.model.Artist;
 import com.project.poshmaal_task2.model.Employee;
 import com.project.poshmaal_task2.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.HttpStatus;
@@ -65,6 +66,43 @@ public class EmployeeController {
             return new ResponseEntity<>("Employee deleted successfully", HttpStatus.OK);
         }else {
             return new ResponseEntity<>("Failed to delete employee", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @QueryMapping(name = "findAllEmployees")
+    public List<Employee> findAllEmployees(){
+
+        List<Employee> employees = employeeRepository.findAllEmployees();
+        if(!employees.isEmpty()){
+            return employees;
+        }else {
+            return null;
+        }
+    }
+
+    @QueryMapping(name = "getEmployee")
+    public Employee findEmployeeByEmail(@Argument String email){
+
+        Employee employee = employeeRepository.findEmployee(email);
+        if(employee!=null){
+            return employee;
+        }else {
+            return null;
+        }
+    }
+
+    @MutationMapping(name = "deleteEmployee")
+    public Boolean deleteEmployeeByEmail(@Argument String email){
+        Employee employee = employeeRepository.findEmployee(email);
+        if(employee!=null){
+            int res = employeeRepository.deleteEmployee(email);
+            if(res==1) {
+                return true;
+            }else{
+                return false;
+            }
+        }else {
+            return false;
         }
     }
 

@@ -2,9 +2,12 @@ package com.project.poshmaal_task2.controller;
 
 import com.project.poshmaal_task2.model.Artist;
 import com.project.poshmaal_task2.model.Artwork;
+import com.project.poshmaal_task2.model.Employee;
 import com.project.poshmaal_task2.repository.ArtistRepository;
 import com.project.poshmaal_task2.repository.ArtworkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -214,6 +217,17 @@ public class ArtworkController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @MutationMapping(name = "addArtwork")
+    public Artwork addArtworkMutation(@Argument Artwork artwork){
+        int res = artworkRepository.addArt(artwork);
+        if(res > 0){
+            return artwork;
+        }else{
+            return null;
+        }
+    }
+
 
 
 }
