@@ -18,6 +18,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepository{
     private final String ADD_EMPLOYEE_SQL = "INSERT INTO Employee (email, firstname, lastname, password, locked, role) VALUES (?, ?, ?, ?, ?, ?)";
     private final String UPDATE_EMPLOYEE_SQL = "UPDATE Employee SET firstname = ?, lastname = ?, password = ?, locked = ?, role = ? WHERE email = ?";
     private final String DELETE_EMPLOYEE_SQL = "DELETE FROM Employee WHERE email = ?";
+    private final String UPDATE_EMPLOYEE_PASSWORD_SQL = "UPDATE Employee SET password = ? WHERE email = ?";
+
 
 
     @Autowired
@@ -47,6 +49,11 @@ public class EmployeeRepositoryImpl implements EmployeeRepository{
     public Employee updateEmployee(String email, Employee employee) {
         int result = jdbcTemplate.update(UPDATE_EMPLOYEE_SQL, employee.getFirstName(), employee.getLastName(), employee.getPassword(), employee.isLocked(), employee.getRole(), email);
         return result == 1 ? employee : null;
+    }
+
+    @Override
+    public int updateEmployeePassword(String email, String newPassword) {
+        return jdbcTemplate.update(UPDATE_EMPLOYEE_PASSWORD_SQL, newPassword, email);
     }
 
 

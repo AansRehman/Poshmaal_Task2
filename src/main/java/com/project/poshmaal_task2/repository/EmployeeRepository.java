@@ -16,4 +16,7 @@ public interface EmployeeRepository {
 
     int deleteEmployee(String email);
 
+    int updateEmployeePassword(String email, String newPassword);
+
+
 }

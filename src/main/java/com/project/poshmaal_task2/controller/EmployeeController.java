@@ -1,5 +1,7 @@
 package com.project.poshmaal_task2.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.poshmaal_task2.model.Artist;
 import com.project.poshmaal_task2.model.Employee;
 import com.project.poshmaal_task2.repository.EmployeeRepository;
@@ -41,6 +43,13 @@ public class EmployeeController {
 
     @PostMapping("/addEmployee")
     public ResponseEntity<String> addEmployee(@RequestBody Employee employee){
+
+        System.out.println(employee.getPassword());
+        if (!isValidPassword(employee.getPassword())) {
+            System.out.println(!isValidPassword(employee.getPassword()));
+            return new ResponseEntity<>("Password must be at least 8 characters long and contain uppercase, lowercase, and digits.", HttpStatus.BAD_REQUEST);
+        }
+
         int res = employeeRepository.addEmployee(employee);
         if (res==1){
             return new ResponseEntity<>("Employee added successfully", HttpStatus.CREATED);
@@ -51,6 +60,12 @@ public class EmployeeController {
 
     @PutMapping("/updateEmployee/{email}")
     public ResponseEntity<Employee> updateEmployee(@PathVariable("email") String email, @RequestBody Employee employee){
+        System.out.println(employee.getPassword());
+        if (!isValidPassword(employee.getPassword())) {
+            System.out.println(!isValidPassword(employee.getPassword()));
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
         Employee employee1 = employeeRepository.updateEmployee(email, employee);
         if(employee1!=null){
             return new ResponseEntity<>(employee1, HttpStatus.OK);
@@ -103,6 +118,60 @@ public class EmployeeController {
             }
         }else {
             return false;
+        }
+    }
+
+//    @PatchMapping("/{email}/password")
+//    public ResponseEntity<String> updateEmployeePassword(@PathVariable("email") String email, @RequestParam("newPassword") String newPassword) {
+//        if (!isValidPassword(newPassword)) {
+//            System.out.println(isValidPassword(newPassword));
+//            return new ResponseEntity<>("Password must be at least 8 characters long and contain uppercase, lowercase, and digits.", HttpStatus.BAD_REQUEST);
+//        }
+//
+//        int result = employeeRepository.updateEmployeePassword(email, newPassword);
+//        if (result == 1) {
+//            return new ResponseEntity<>("Password updated successfully", HttpStatus.OK);
+//        } else {
+//            return new ResponseEntity<>("Failed to update password", HttpStatus.NOT_FOUND);
+//        }
+//    }
+
+    private boolean isValidPassword(String password) throws IllegalArgumentException
+    {
+//        System.out.println("Password: "+password);
+        String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,20}$";
+        if (!password.matches(regex))
+            throw new IllegalArgumentException("Password must be 8-20 characters long and contain at least one uppercase letter, one lowercase letter, and one digit.");
+
+        return password.matches(regex);
+    }
+
+
+    @PatchMapping("/{email}/password")
+    public ResponseEntity<String> updateEmployeePasswordBody(@PathVariable("email") String email, @RequestBody String newPasswordBody) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String newPassword;
+        try {
+            JsonNode rootNode = objectMapper.readTree(newPasswordBody);
+            newPassword = rootNode.get("newPassword").asText();
+        } catch (Exception e) {
+            return new ResponseEntity<>("Invalid JSON format", HttpStatus.BAD_REQUEST);
+        }
+
+//        System.out.println("Password: " + newPassword);
+
+
+//        System.out.println(newPassword);
+        if (!isValidPassword(newPassword)) {
+//            System.out.println(!isValidPassword(newPassword));
+            return new ResponseEntity<>("Password must be at least 8 characters long and contain uppercase, lowercase, and digits.", HttpStatus.BAD_REQUEST);
+        }
+
+        int result = employeeRepository.updateEmployeePassword(email, newPassword);
+        if (result == 1) {
+            return new ResponseEntity<>("Password updated successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Failed to update password", HttpStatus.NOT_FOUND);
         }
     }
 
