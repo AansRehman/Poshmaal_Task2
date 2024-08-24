@@ -25,64 +25,92 @@ public class EmployeeController {
 
     @GetMapping("/findAllEmployees")
     public ResponseEntity<List<Employee>> getAllEmployees(){
-        List<Employee> employees = employeeRepository.findAllEmployees();
-        if(employees.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }else {
-            return new ResponseEntity<>(employees, HttpStatus.OK);
+        try {
+
+            List<Employee> employees = employeeRepository.findAllEmployees();
+            if (employees.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            } else {
+                return new ResponseEntity<>(employees, HttpStatus.OK);
+            }
+        }catch (Exception e){
+            System.out.println(e);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/getEmployeeByEmail/{email}")
     public ResponseEntity<Employee> getEmployeeById(@PathVariable("email") String email){
-        Employee employee = employeeRepository.findEmployee(email);
-        if (employee!=null){
-            return new ResponseEntity<>(employee, HttpStatus.OK);
-        }else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+
+            Employee employee = employeeRepository.findEmployee(email);
+            if (employee != null) {
+                return new ResponseEntity<>(employee, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+        }catch (Exception e){
+            System.out.println(e);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/addEmployee")
     public ResponseEntity<String> addEmployee(@Valid @RequestBody Employee employee){
+        try {
 
-        System.out.println(employee.getPassword());
-        if (!isValidPassword(employee.getPassword())) {
-            System.out.println(!isValidPassword(employee.getPassword()));
-            return new ResponseEntity<>("Password must be at least 8 characters long and contain uppercase, lowercase, and digits.", HttpStatus.BAD_REQUEST);
-        }
+            System.out.println(employee.getPassword());
+            if (!isValidPassword(employee.getPassword())) {
+                System.out.println(!isValidPassword(employee.getPassword()));
+                return new ResponseEntity<>("Password must be at least 8 characters long and contain uppercase, lowercase, and digits.", HttpStatus.BAD_REQUEST);
+            }
 
-        int res = employeeRepository.addEmployee(employee);
-        if (res==1){
-            return new ResponseEntity<>("Employee added successfully", HttpStatus.CREATED);
-        }else {
-            return new ResponseEntity<>("Failed to add employee", HttpStatus.NOT_MODIFIED);
+            int res = employeeRepository.addEmployee(employee);
+            if (res == 1) {
+                return new ResponseEntity<>("Employee added successfully", HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity<>("Failed to add employee", HttpStatus.BAD_REQUEST);
+            }
+        }catch (Exception e){
+            System.out.println(e);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping("/updateEmployee/{email}")
     public ResponseEntity<Employee> updateEmployee(@PathVariable("email") String email, @Valid @RequestBody Employee employee){
-        System.out.println(employee.getPassword());
-        if (!isValidPassword(employee.getPassword())) {
-            System.out.println(!isValidPassword(employee.getPassword()));
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        try {
 
-        Employee employee1 = employeeRepository.updateEmployee(email, employee);
-        if(employee1!=null){
-            return new ResponseEntity<>(employee1, HttpStatus.OK);
-        }else{
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            System.out.println(employee.getPassword());
+            if (!isValidPassword(employee.getPassword())) {
+                System.out.println(!isValidPassword(employee.getPassword()));
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            Employee employee1 = employeeRepository.updateEmployee(email, employee);
+            if (employee1 != null) {
+                return new ResponseEntity<>(employee1, HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+        }catch (Exception e){
+            System.out.println(e);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
     @DeleteMapping("/deleteEmployee/{email}")
     public ResponseEntity<String> deleteEmployee(@PathVariable("email") String email){
+        try {
+
         int res = employeeRepository.deleteEmployee(email);
         if (res==1){
-            return new ResponseEntity<>("Employee deleted successfully", HttpStatus.OK);
+            return new ResponseEntity<>("Employee deleted successfully", HttpStatus.NO_CONTENT);
         }else {
-            return new ResponseEntity<>("Failed to delete employee", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Failed to delete employee", HttpStatus.BAD_REQUEST);
+        }
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -151,29 +179,33 @@ public class EmployeeController {
 
     @PatchMapping("/{email}/password")
     public ResponseEntity<String> updateEmployeePasswordBody(@PathVariable("email") String email, @Valid @RequestBody String newPasswordBody) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String newPassword;
         try {
-            JsonNode rootNode = objectMapper.readTree(newPasswordBody);
-            newPassword = rootNode.get("newPassword").asText();
-        } catch (Exception e) {
-            return new ResponseEntity<>("Invalid JSON format", HttpStatus.BAD_REQUEST);
-        }
+            ObjectMapper objectMapper = new ObjectMapper();
+            String newPassword;
+            try {
+                JsonNode rootNode = objectMapper.readTree(newPasswordBody);
+                newPassword = rootNode.get("newPassword").asText();
+            } catch (Exception e) {
+                return new ResponseEntity<>("Invalid JSON format", HttpStatus.BAD_REQUEST);
+            }
 
 //        System.out.println("Password: " + newPassword);
 
 
 //        System.out.println(newPassword);
-        if (!isValidPassword(newPassword)) {
+            if (!isValidPassword(newPassword)) {
 //            System.out.println(!isValidPassword(newPassword));
-            return new ResponseEntity<>("Password must be at least 8 characters long and contain uppercase, lowercase, and digits.", HttpStatus.BAD_REQUEST);
-        }
+                return new ResponseEntity<>("Password must be at least 8 characters long and contain uppercase, lowercase, and digits.", HttpStatus.BAD_REQUEST);
+            }
 
-        int result = employeeRepository.updateEmployeePassword(email, newPassword);
-        if (result == 1) {
-            return new ResponseEntity<>("Password updated successfully", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Failed to update password", HttpStatus.NOT_FOUND);
+            int result = employeeRepository.updateEmployeePassword(email, newPassword);
+            if (result == 1) {
+                return new ResponseEntity<>("Password updated successfully", HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity<>("Failed to update password", HttpStatus.BAD_REQUEST);
+            }
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
