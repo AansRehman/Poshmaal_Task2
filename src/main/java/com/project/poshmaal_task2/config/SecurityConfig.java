@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/h2/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/**").permitAll()  // No authentication for GET
+                        .requestMatchers(HttpMethod.GET, "/**").authenticated() // Authentication for GET
                         .requestMatchers(HttpMethod.POST, "/artist/**", "/artwork/**").hasAnyRole("MANAGER", "BUYER")
                         .requestMatchers(HttpMethod.PUT, "artwork/changePrice/**").hasAnyRole("MANAGER","BUYER")
                         .requestMatchers(HttpMethod.PUT, "/artwork/**", "artist/**").authenticated()
