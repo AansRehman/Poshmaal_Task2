@@ -24,3 +24,6 @@ CREATE TABLE IF NOT EXISTS Employee (
     locked BOOLEAN NOT NULL,
     role VARCHAR(50) NOT NULL
     );
+
+INSERT INTO employee (email, firstname, lastname, password, locked, role) VALUES ('manager@super.com', 'super', 'manager', 'manager', false, 'MANAGER');
+
