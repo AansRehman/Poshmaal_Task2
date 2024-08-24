@@ -5,11 +5,13 @@ import com.project.poshmaal_task2.model.Artwork;
 import com.project.poshmaal_task2.model.Employee;
 import com.project.poshmaal_task2.repository.ArtistRepository;
 import com.project.poshmaal_task2.repository.ArtworkRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -45,7 +47,7 @@ public class ArtworkController {
     }
 
     @PostMapping("/addArtwork")
-    public ResponseEntity<String> addArtwork(@RequestBody Artwork artwork){
+    public ResponseEntity<String> addArtwork(@Valid @RequestBody Artwork artwork){
         int res = artworkRepository.addArt(artwork);
         if(res==1){
             return new ResponseEntity<>("Artwork added successfully", HttpStatus.CREATED);
@@ -55,7 +57,7 @@ public class ArtworkController {
     }
 
     @PutMapping("/updateArtwork/{id}")
-    public ResponseEntity<Artwork> updateArtwork(@PathVariable("id") Long id, @RequestBody Artwork artwork){
+    public ResponseEntity<Artwork> updateArtwork(@PathVariable("id") Long id, @Valid @RequestBody Artwork artwork){
         Artwork artwork1 = artworkRepository.updateArtwork(id, artwork);
         if(artwork1==artwork){
             return new ResponseEntity<>(artwork1, HttpStatus.OK);
@@ -193,7 +195,7 @@ public class ArtworkController {
     }
 
     @PutMapping("/changePrice/{id}")
-    public ResponseEntity<Artwork> changePrice(@PathVariable("id") Long id, @RequestBody double price){
+    public ResponseEntity<Artwork> changePrice(@PathVariable("id") Long id, @Valid @RequestBody double price){
         Artwork artwork = artworkRepository.findArtWorkById(id);
 
         if (artwork != null) {
@@ -206,7 +208,7 @@ public class ArtworkController {
     }
 
     @PutMapping("/changeStatus/{id}")
-    public ResponseEntity<Artwork> changeStatus(@PathVariable("id") Long id, @RequestBody boolean status){
+    public ResponseEntity<Artwork> changeStatus(@PathVariable("id") Long id, @Valid @RequestBody boolean status){
         Artwork artwork = artworkRepository.findArtWorkById(id);
 
         if (artwork != null) {
@@ -226,6 +228,17 @@ public class ArtworkController {
         }else{
             return null;
         }
+    }
+
+    // Handle validation errors globally for this controller
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        StringBuilder errors = new StringBuilder();
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String errorMessage = error.getDefaultMessage();
+            errors.append(errorMessage).append("; ");
+        });
+        return new ResponseEntity<>(errors.toString(), HttpStatus.BAD_REQUEST);
     }
 
 

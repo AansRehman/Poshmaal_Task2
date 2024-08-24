@@ -4,10 +4,13 @@ import com.project.poshmaal_task2.model.Artist;
 import com.project.poshmaal_task2.model.Artwork;
 import com.project.poshmaal_task2.model.Employee;
 import com.project.poshmaal_task2.repository.ArtistRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,7 +44,7 @@ public class ArtistController {
     }
 
     @PostMapping("/addArtist")
-    public ResponseEntity<String> addArtist(@RequestBody Artist artist){
+    public ResponseEntity<String> addArtist(@Valid @RequestBody Artist artist){
         int res = artistRepository.addArtist(artist);
         if (res==1){
             return new ResponseEntity<>("Artist added successfully", HttpStatus.CREATED);
@@ -51,7 +54,7 @@ public class ArtistController {
     }
 
     @PutMapping("/updateArtist/{id}")
-    public ResponseEntity<Artist> updateArtist(@PathVariable("id") Long id, @RequestBody Artist artist){
+    public ResponseEntity<Artist> updateArtist(@PathVariable("id") Long id, @Valid @RequestBody Artist artist){
         Artist artist1 = artistRepository.updateArtist(id, artist);
         if(artist1!=null){
             return new ResponseEntity<>(artist1, HttpStatus.OK);
@@ -70,6 +73,17 @@ public class ArtistController {
         }
     }
 
+
+    // Handle validation errors globally for this controller
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        StringBuilder errors = new StringBuilder();
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String errorMessage = error.getDefaultMessage();
+            errors.append(errorMessage).append("; ");
+        });
+        return new ResponseEntity<>(errors.toString(), HttpStatus.BAD_REQUEST);
+    }
 
 
 

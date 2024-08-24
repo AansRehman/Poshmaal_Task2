@@ -5,12 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.poshmaal_task2.model.Artist;
 import com.project.poshmaal_task2.model.Employee;
 import com.project.poshmaal_task2.repository.EmployeeRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,7 +44,7 @@ public class EmployeeController {
     }
 
     @PostMapping("/addEmployee")
-    public ResponseEntity<String> addEmployee(@RequestBody Employee employee){
+    public ResponseEntity<String> addEmployee(@Valid @RequestBody Employee employee){
 
         System.out.println(employee.getPassword());
         if (!isValidPassword(employee.getPassword())) {
@@ -59,7 +61,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/updateEmployee/{email}")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable("email") String email, @RequestBody Employee employee){
+    public ResponseEntity<Employee> updateEmployee(@PathVariable("email") String email, @Valid @RequestBody Employee employee){
         System.out.println(employee.getPassword());
         if (!isValidPassword(employee.getPassword())) {
             System.out.println(!isValidPassword(employee.getPassword()));
@@ -148,7 +150,7 @@ public class EmployeeController {
 
 
     @PatchMapping("/{email}/password")
-    public ResponseEntity<String> updateEmployeePasswordBody(@PathVariable("email") String email, @RequestBody String newPasswordBody) {
+    public ResponseEntity<String> updateEmployeePasswordBody(@PathVariable("email") String email, @Valid @RequestBody String newPasswordBody) {
         ObjectMapper objectMapper = new ObjectMapper();
         String newPassword;
         try {
@@ -173,6 +175,17 @@ public class EmployeeController {
         } else {
             return new ResponseEntity<>("Failed to update password", HttpStatus.NOT_FOUND);
         }
+    }
+
+    // Handle validation errors globally for this controller
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        StringBuilder errors = new StringBuilder();
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String errorMessage = error.getDefaultMessage();
+            errors.append(errorMessage).append("; ");
+        });
+        return new ResponseEntity<>(errors.toString(), HttpStatus.BAD_REQUEST);
     }
 
 
